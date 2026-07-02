@@ -28,4 +28,4 @@ jobs:
       run: python -m build
 
     - name: Envoyer sur PyPI
-      uses: pypa/gha-action-pypi-publish@release/v1
+      uses: pypa/gha-action-pypi-publish
