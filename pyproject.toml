@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cipher-secret-mahdi"
+version = "0.1.0"
+authors = [
+  { name="mahdichaari100" },
+]
+description = "Une librairie Python moderne pour chiffrer et déchiffrer des textes, listes et dictionnaires avec le chiffrement de César."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
