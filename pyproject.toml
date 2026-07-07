@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cipher-secret-mahdi"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
   { name="mahdichaari100" },
 ]
-description = "Une librairie Python moderne pour chiffrer et déchiffrer des textes, listes et dictionnaires avec le chiffrement de César."
+description = "Une librairie Python moderne pour chiffrer et déchiffrer des textes, listes et dictionnaires avec le chiffrement de César et de Vigenère."
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
