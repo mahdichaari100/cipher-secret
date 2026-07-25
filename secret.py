@@ -1,5 +1,5 @@
+import unicodedata
 # Méthode de chiffrement "Cesar"
-
 class Cesar:
     """Logique pure du chiffrement de César par décalage fixe."""
 
@@ -89,8 +89,7 @@ class Cesar:
 
     def chiffre(self, chaine):
         """Chiffre une chaîne de caractères, un int ou un float par décalage."""
-        chaine_chiffre = str(chaine)
-        self.__text_chiffre = ""
+        chaine_chiffre = enlever_accents( str(chaine) )
         for i in chaine_chiffre:
             if i.isalpha():
                 if "a" <= i <= "z":
@@ -242,7 +241,7 @@ class Vigenere:
 
     def chiffre(self, chaine):
         """Chiffre une chaîne de caractères (str), un int ou un float."""
-        chaine_chiffre = str(chaine)
+        chaine_chiffre = enlever_accents( str(chaine) )
         self.__text_chiffre = ""
         index_cle = 0  # Permet d'avancer dans la clé uniquement pour les lettres lues
 
@@ -320,7 +319,6 @@ class Secret:
 
     def __init__(self, methode="cesar", **kwargs):
         # Validation stricte des arguments bonus autorisés
-        
         if not all(x in ["decalage", "numero", "cle"] for x in list(kwargs.keys())):
             raise ValueError(
                 "Les arguments choisis autre que methode sont "
@@ -385,7 +383,6 @@ class Secret:
             )
 
         # Appeler la classe selon la méthode choisie et quelques données
-        
         match element:
             case str():
                 return self.moteur.dechiffre(element)
@@ -398,3 +395,9 @@ class Secret:
                     "L'élément à déchiffrer doit être de type str, dict, list ou tuple"
                 )
 
+def enlever_accents(texte):
+    # Décompose les caractères accentués
+    normalise = unicodedata.normalize('NFD', texte)
+    # Filtre pour garder uniquement les caractères qui ne sont pas des diacritiques
+    sans_accents = ''.join(c for c in normalise if unicodedata.category(c) != 'Mn')
+    return sans_accents
