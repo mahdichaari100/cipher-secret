@@ -95,6 +95,35 @@ print(outil.dechiffrage(dict_both, dictionnaire="both"))
 ```
 
 ---
+### Cas 4 : Outils d'affichage et décryptage avancé (`afficher`, `casser_vigenere`)
+La librairie propose des fonctions indépendantes pour analyser vos chiffrements ou casser les codes secrets sans connaître la clé d'origine.
+
+```python
+# --- Exemple 1 : Affichage formaté avec la fonction afficher() ---
+from secret import afficher
+
+# Permet d'analyser visuellement la structure d'un texte chiffré
+afficher("Cuxuir-empvef-unldu qf e rajhwt Bggloz tvfrmzl heeqtrep nbv sqkhve pige ezkecpfqbr. If anjexg cvoomfwee agvizof, ruyjrvs, xqfxs, fccpee, iah fgty hiobvsnmzvis gavrg Oirwad iah Vuorredm pmptmew.")
+
+"""
+   -----ce code peut faire des erreur avec les textes courts et les clés longues-----
+  --- Lancement de la cyber-analyse ---
+  [+] Longueur de clé détectée : 5 lettres
+  [+] Clé secrète découverte : AMINE
+  
+  [+] Message déchiffré :
+  
+  Cipher-secret-mahdi is a robust Python library designed for secure data encryption. It safely processes strings, numbers, lists, tuples, and full dictionaries using      Caesar and Vigenere ciphers.
+"""
+# --- Exemple 2 : Cryptanalyse avec la fonction casser_vigenere() ---
+from secret import casser_vigenere
+
+# Retrouve automatiquement la clé secrète et le texte d'origine par analyse statistique
+resultat = casser_vigenere("Cuxuir-empvef-unldu qf e rajhwt Bggloz tvfrmzl heeqtrep nbv sqkhve pige ezkecpfqbr. If anjexg cvoomfwee agvizof, ruyjrvs, xqfxs, fccpee, iah fgty hiobvsnmzvis gavrg Oirwad iah Vuorredm pmptmew.")
+
+print(resultat)  # Retourne la clé détectée et le texte décodé
+```
+
 
 ## ⚠️ Gestion des erreurs et sécurité
 La librairie intègre des vérifications strictes pour vous aider à coder sans commettre d'erreurs :
