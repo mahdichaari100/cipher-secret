@@ -1,3 +1,5 @@
+import string
+import sys
 import unicodedata
 # Méthode de chiffrement "Cesar"
 class Cesar:
@@ -401,3 +403,116 @@ def enlever_accents(texte):
     # Filtre pour garder uniquement les caractères qui ne sont pas des diacritiques
     sans_accents = ''.join(c for c in normalise if unicodedata.category(c) != 'Mn')
     return sans_accents
+
+
+"""
+    Partie déchiffrer les textes chiffré en anglais seulement
+    ce code peut déchiffrer les texte contenant plusque 150 caractères
+    attention: ce code peut faire des erreurs si le texte est court et la clé contient plusque 6 caractère
+"""
+# Les fréquences d'apparition des lettres en anglais (de A à Z)
+ENGLISH_FREQS = [
+    0.0817, 0.0149, 0.0278, 0.0425, 0.1270, 0.0223, 0.0202, 0.0609, 0.0697,
+    0.0015, 0.0077, 0.0402, 0.0241, 0.0675, 0.0751, 0.0193, 0.0009, 0.0599,
+    0.0633, 0.0906, 0.0276, 0.0098, 0.0236, 0.0015, 0.0197, 0.0007
+]
+
+def nettoyer_texte(texte):
+    """Garde uniquement les lettres en majuscules pour faciliter les calculs."""
+    return "".join([c.upper() for c in texte if c.isalpha()])
+
+def indice_coincidence(texte):
+    """Calcule l'Indice de Coïncidence (IC) pour mesurer la répétition des lettres."""
+    n = len(texte)
+    if n <= 1:
+        return 0.0
+    frequences = [texte.count(lettre) for lettre in string.ascii_uppercase]
+    somme = sum(f * (f - 1) for f in frequences)
+    return somme / (n * (n - 1))
+
+def deviner_taille_cle(texte_nettoye, taille_max=20):
+    """Trouve la longueur de clé la plus petite et probable en utilisant un seuil d'IC."""
+    for taille in range(1, taille_max + 1):
+        ics = []
+        for i in range(taille):
+            sous_groupe = texte_nettoye[i::taille]
+            ics.append(indice_coincidence(sous_groupe))
+        
+        ic_moyen = sum(ics) / len(ics)
+        
+        # Correction : Si l'IC dépasse 0.060, on valide immédiatement la taille.
+        # Cela empêche le programme de choisir un multiple comme 12 au lieu de 6.
+        if ic_moyen > 0.060:
+            return taille
+            
+    return 1
+
+def deviner_lettre_cle(sous_groupe):
+    """Trouve la meilleure lettre de décalage en comparant avec l'anglais. en utilisant la règle de "Khi-deux" """
+    n = len(sous_groupe)
+    meilleur_score = float('inf')
+    meilleur_decalage = 0
+    
+    for decalage in range(26): #tester tout les décalage possibe 
+        frequences_observees = [0] * 26
+        for lettre in sous_groupe:
+            index = (ord(lettre) - ord('A') - decalage) % 26
+            frequences_observees[index] += 1
+            
+        score = 0
+        for i in range(26):
+            attendue = n * ENGLISH_FREQS[i]
+            observee = frequences_observees[i]
+            if attendue > 0:
+                score += ((observee - attendue) ** 2) / attendue
+                
+        if score < meilleur_score:
+            meilleur_score = score
+            meilleur_decalage = decalage
+            
+    return chr(ord('A') + meilleur_decalage)
+
+def casser_vigenere(texte_code):
+    """Fonction principale pour trouver la clé et déchiffrer le message."""
+    texte_nettoye = nettoyer_texte(texte_code)
+    if len(texte_nettoye)<150 :
+        sys.exit("Erreur : il faut que le texte contient plus que 150 lettres !")
+    # 1. Trouver la taille de la clé
+    taille_cle = deviner_taille_cle(texte_nettoye)
+    print(f"[+] Longueur de clé détectée : {taille_cle} lettres")
+    
+    # 2. Trouver chaque lettre de la clé
+    cle = ""
+    for i in range(taille_cle):
+        sous_groupe = texte_nettoye[i::taille_cle]
+        cle += deviner_lettre_cle(sous_groupe)
+    print(f"[+] Clé secrète découverte : {cle}")
+    
+    # 3. Déchiffrer le texte d'origine avec la clé trouvée
+    texte_dechiffre = []
+    index_cle = 0
+    for caractere in texte_code:
+        if caractere.isalpha():
+            est_majuscule = caractere.isupper()
+            decalage = ord(cle[index_cle % taille_cle]) - ord('A')
+            
+            origine = ord(caractere.upper()) - decalage
+            if origine < ord('A'):
+                origine += 26
+                
+            lettre_finale = chr(origine)
+            texte_dechiffre.append(lettre_finale if est_majuscule else lettre_finale.lower())
+            index_cle += 1
+        else:
+            texte_dechiffre.append(caractere)
+            
+    return "".join(texte_dechiffre)
+
+# --- ZONE DE TEST ---
+
+def afficher(message_secret):
+    print("-----ce code peut faire des erreur avec les textes courts et les clés longues-----")
+    print("--- Lancement de la cyber-analyse ---")
+    resultat = casser_vigenere(message_secret)
+    print("\n[+] Message déchiffré :\n")
+    print(resultat)
